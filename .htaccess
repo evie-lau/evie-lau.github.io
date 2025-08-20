@@ -1,0 +1,60 @@
+# .htaccess for additional bot protection
+# Note: This file works with Apache servers. GitHub Pages uses nginx, 
+# but keeping this for potential future server migrations.
+
+# Block suspicious user agents
+RewriteEngine On
+RewriteCond %{HTTP_USER_AGENT} ^$ [OR]
+RewriteCond %{HTTP_USER_AGENT} (ahrefsbot|mj12bot|dotbot|semrushbot|seznambot|blexbot|megaindex|linkdexbot) [NC,OR]
+RewriteCond %{HTTP_USER_AGENT} (python-requests|scrapy|selenium|phantomjs|headless) [NC]
+RewriteRule ^.*$ - [F,L]
+
+# Rate limiting - block IPs making more than 60 requests per minute
+# (This requires mod_evasive or similar module)
+# <IfModule mod_evasive24.c>
+#     DOSHashTableSize    16
+#     DOSPageCount        5
+#     DOSSiteCount        50
+#     DOSPageInterval     1
+#     DOSSiteInterval     1
+#     DOSBlockingPeriod   600
+# </IfModule>
+
+# Security headers
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options nosniff
+    Header always set X-Frame-Options DENY
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+</IfModule>
+
+# Prevent access to sensitive files
+<Files "*.log">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+<Files ".htaccess">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+<Files "*.json">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# Cache control
+<IfModule mod_expires.c>
+    ExpiresActive on
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/ico "access plus 1 year"
+    ExpiresByType image/icon "access plus 1 year"
+    ExpiresByType text/html "access plus 1 hour"
+</IfModule>
