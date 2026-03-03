@@ -1,0 +1,8 @@
+.git
+.gitignore
+.dockerignore
+Dockerfile
+README.md
+LICENSE.txt
+BOT_PROTECTION.md
+assets/sass
